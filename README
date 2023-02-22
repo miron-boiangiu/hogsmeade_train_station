@@ -1,0 +1,112 @@
+Details of functions' implementation and functionality:
+
+
+TrainStation* open_train_station(int platforms_no): allocates memory for a new train station
+with the desired number of platforms on it. It also sets all of the pointers to Trains
+to NULL by using calloc.
+
+
+void close_train_station(TrainStation *station): deallocates memory for an existing train station
+by removing all trains from it first (using leave_train(station, platform)) and then removing
+the station itself.
+
+
+void show_existing_trains(TrainStation *station, FILE *f): goes through all of the platforms
+of a station and checks if there is a train on them. If there is, it first prints the train then
+all of its traincars.
+
+
+void arrive_train(TrainStation *station, int platform, int locomotive_power): if possible, allocates
+memory for a train and puts it on the station at the platform specified, then sets it locomotive power.
+It also has a pointer to the list of traincars, which starts as NULL.
+
+
+void leave_train(TrainStation *station, int platform): deallocates memory for all the traincars associated
+to a train and then the memory of the train itself, and sets the platform as being free by setting it
+to NULL. This function uses the auxiliary function void remove_all_traincars(TrainCar* traincar).
+
+  (-) void remove_all_traincars(TrainCar* traincar): recursive function which puts on the top of the stack
+the last traincars, then removes them one by one. The last one removed is the first traincar. It is done
+like so in order to maintain a path to the following traincars, which would be lost if we started by
+removing the first traincar.
+
+
+void add_train_car(TrainStation *station, int platform, int weight): checks if it is possible to add
+a traincar to the respective train, and, if it is, allocates memory for it and puts it at the end
+of the list of traincars.
+
+
+void remove_train_cars(TrainStation *station, int platform, int weight): if there is a train on
+that specific platform, checks for all the traincars if they have the undesired weight and then removes
+them, constantly updating the list of traincars. It starts by checking if the first traincars have
+the undesired weight and only moves on to the rest of the traincars when it is done with all of the ones
+that have that weight in the beginning, because they require an update to the train's pointer to the
+traincars as well.
+
+ 
+int count_train_cars(Train* train): counts the number of traincars that a train points to. Nothing
+interesting to see here. Seriously, stop reading, move along. Dude, why are you still reading this?
+Also, do you seriously read the READMEs? I didn't expect you to, damn. This was the most difficult
+function to write so far, it took me several attempts over several days over several banged heads
+against the wall.
+
+
+void move_train_cars(TrainStation *station, int platform_a, int pos_a, 
+int cars_no, int platform_b, int pos_b): an absolutely disgusting piece of code that barely works.
+First, it checks for a bunch of stuff that the function caller could get wrong and makes sure that
+the move is actually possible. After wards, it takes a pointer to the traincars we need to move
+and puts them in their respective place. It also rejoins the connection of the traincar before the ones
+we removed to the one after the traincars we moved. This was, actually, the most difficult function
+in all of this task.
+
+
+  (-) int traincar_sequence_sum(Train* train, int pos, int how_many): another auxiliary function which
+made my life so much easier and I'm glad I thought of it! It simply sums up <how_many> traincars
+pointed to by the train, starting from the position <pos>. It is used in  all of the following functions,
+by far the best investment of my life! Note: it assumes the arguments are correct, so I have to make sure
+
+
+int find_express_train(TrainStation *station): using int traincar_sequence_sum() and count_train_cars(), 
+it sums up the weight of the traincars of each train and checks if they have the biggest locomotive power
+to traincars weight difference. It returns the platform number of the fastest train.
+
+
+int find_overload_train(TrainStation *station): using int traincar_sequence_sum() and count_train_cars(), 
+it sums up the weight of the traincars of each train and checks if the traincar can move. It returns the 
+platform number of the overloaded train.
+
+
+int find_optimal_train(TrainStation *station): calculates the difference between the train's power and its
+traincars' weight for all of the trains on the platform. If they have the smallest difference so far, it 
+remembers the platform the train was located at. At the end, it returns the train with the smallest difference
+(that can still move).
+
+
+int find_heaviest_sequence_train(TrainStation *station, int cars_no, TrainCar **start_car): this is where  
+traincar_sequence_sum() really shines: the function goes through all of the trains and memorizes where
+it found the heaviest sequence of <cars_no> traincars, in a similar fashion to the couple of functions before
+this one.
+
+
+  (-)int positionOfHeaviestTrainCar(Train* train): another auxiliary function I made! It goes
+through the traincars of a train and returns the position of the heaviest one.
+
+
+void order_train(TrainStation *station, int platform): it uses positionOfHeaviestTrainCar(Train* train) to check
+which traincar is the heaviest one pointed to by a train and then moves it to a new sequence of traincars.
+It does this for all of the traincars initially pointed to by the train, then makes the train point to the new
+sequence of traincars.
+
+
+  (-)int sumOfAllTraincarsExceptOne(Train* train, int pos): this is an auxiliary function that uses an auxiliary
+function! Wow! It sums up the weight of all of the traincars EXCEPT the one at the specified position. 
+
+
+void fix_overload_train(TrainStation *station): first, it uses find_overload_train() to see where we are going to
+need to remove a traincar. Then, it goes through all of the traincars of it and uses sumOfAllTraincarsExceptOne()
+to see if, by removing that one, the train can now move and if the weight moves is the largest one so far.
+It then removes the traincar which made the train move the most weight.
+
+-----------------------------------------------------------------------------------------------------------------
+
+I'm finally done, yaay!
